@@ -1,0 +1,169 @@
+/* Smart Recycling Assistant - look and feel.
+   Colors, font and sizes are defined once here; change them to re-theme the whole app. */
+:root {
+  --tree-green: #7A8A3A;       /* main green (same as the tree) */
+  --tree-green-dark: #5A6924;  /* text on green, better contrast */
+  --tree-green-soft: #F3F5EA;  /* very light green fill */
+  --gray-light: #EAEFF3;
+  --text: #2B3A45;
+  --title-color: #111111;      /* try #17344A for a dark navy title */
+  --font: "Times New Roman", Times, serif;
+  --page-pad: 3rem;            /* left/right space of the page */
+  --box-width: 440px;          /* width of the upload box AND of every box under it */
+}
+
+/* Font: Times New Roman everywhere (icons keep their own font) */
+.stApp, .stApp p, .stApp li, .stApp label, .stApp small, .stApp button,
+.stApp h1, .stApp h2, .stApp h3, .stApp h4,
+.stApp div:not([data-testid="stIconMaterial"]),
+.stApp span:not([data-testid="stIconMaterial"]):not([class*="material"]) {
+  font-family: var(--font);
+}
+
+/* Page: wide, white, no sideways scrolling */
+.stApp { background: #FFFFFF; overflow-x: hidden; }
+.block-container {
+  max-width: 100% !important;
+  padding: 1.5rem var(--page-pad) 4rem var(--page-pad) !important;
+}
+#MainMenu, footer, header { visibility: hidden; }
+
+/* ---------------------------------------------------------------- Header bar */
+.site-header {
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  padding: .2rem 0 1rem 0; margin-bottom: .5rem; border-bottom: 1px solid var(--gray-light);
+}
+.brand { display: flex; align-items: center; gap: .6rem; font-size: 1.35rem; font-weight: 700; color: var(--title-color); }
+.brand-icon {
+  display: flex; align-items: center; justify-content: center; width: 36px; height: 36px;
+  border-radius: 50%; background: var(--tree-green-soft); border: 1px solid var(--tree-green); font-size: 1.05rem;
+}
+
+/* ---------------------------------------------------------------- Top section
+   Left: everything the user sees, in one column. The tree picture is painted behind it
+   (variable --hero-url, set in app.py) with a FIXED height, so it never changes size
+   when the column below it grows. */
+.st-key-top {
+  position: relative;
+  min-height: calc(100vh - 6rem);                 /* about one full screen */
+  display: flex !important; flex-direction: column !important; justify-content: flex-start !important;
+  padding-top: clamp(1rem, 14vh, 9rem);           /* keeps the column in the same place while it grows */
+}
+.st-key-top > * { position: relative; z-index: 1; }   /* content stays above the picture */
+.st-key-top [data-testid="stHorizontalBlock"] { align-items: flex-start; }
+.st-key-top::before {                                  /* the picture (desktop) */
+  content: ""; position: absolute; z-index: 0; pointer-events: none;
+  top: 0; left: 0; right: calc(-1 * var(--page-pad));  /* reaches the right edge */
+  height: calc(100vh - 6rem);
+  background: var(--hero-url, none) center / cover no-repeat;
+  /* soft fade on the left and at the bottom so the picture melts into the page */
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 12%, #000 100%),
+                      linear-gradient(to bottom, #000 0, #000 85%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(to right, transparent 0, #000 12%, #000 100%),
+              linear-gradient(to bottom, #000 0, #000 85%, transparent 100%);
+  mask-composite: intersect;
+}
+.st-key-top::after { content: none; }
+
+.hero-title {
+  text-align: center; color: var(--title-color); font-weight: 700; line-height: 1.05;
+  letter-spacing: -0.5px; margin: 0; padding: 0;
+  font-size: 3rem; font-size: clamp(2.4rem, 4.6vw, 4.8rem);
+}
+.hero-description {
+  text-align: center; color: #5F7280; line-height: 1.5;
+  width: 100%; max-width: 460px;
+  margin: 1rem auto 1.6rem auto !important;
+  font-size: 1rem; font-size: clamp(.95rem, 1.35vw, 1.25rem);   /* about 35-40% of the title */
+}
+
+/* ---------------------------------------------------------------- Upload box (green)
+   !important is used on purpose: newer Streamlit versions set their own styles on this widget.
+   When a picture is uploaded, app.py adds a small <style> that puts the picture inside this box. */
+.stApp [data-testid="stFileUploader"] { max-width: var(--box-width); margin: 0 auto; }
+.stApp [data-testid="stFileUploaderDropzone"] {
+  display: flex !important; flex-direction: column !important;
+  align-items: center !important; justify-content: center !important;
+  gap: .35rem !important; min-height: 240px !important; padding: 1.5rem !important;
+  background: var(--tree-green-soft) !important;
+  border: 2px dashed var(--tree-green) !important; border-radius: 22px !important;
+  box-shadow: 0 6px 24px rgba(122, 138, 58, .18) !important; transition: all .2s ease;
+}
+.stApp [data-testid="stFileUploaderDropzone"]:hover {
+  box-shadow: 0 10px 30px rgba(122, 138, 58, .32) !important;
+}
+.stApp [data-testid="stFileUploaderDropzone"]::before {
+  content: "+"; font-size: 76px; font-weight: 200; line-height: 1; color: var(--tree-green);
+}
+/* Hide Streamlit's default texts ("Drag and drop...", "200MB per file...") and show ours */
+.stApp [data-testid="stFileUploaderDropzoneInstructions"] {
+  display: flex !important; flex-direction: column !important; align-items: center !important; gap: .2rem;
+}
+.stApp [data-testid="stFileUploaderDropzoneInstructions"] * { display: none !important; }
+.stApp [data-testid="stFileUploaderDropzone"] small { display: none !important; }
+.stApp [data-testid="stFileUploaderDropzoneInstructions"]::before {
+  content: "Upload an Image"; font-size: 1.45rem; font-weight: 700; color: var(--tree-green-dark);
+}
+.stApp [data-testid="stFileUploaderDropzoneInstructions"]::after {
+  content: "Choose an image from your device."; font-size: 1rem; color: #8A9470;
+}
+.stApp [data-testid="stFileUploaderDropzone"] button {
+  margin-top: .6rem !important; border-radius: 999px !important;
+  border: 1px solid var(--tree-green) !important; color: var(--tree-green-dark) !important;
+  background: #FFFFFF !important;
+}
+.stApp [data-testid="stFileUploaderDropzone"] button:hover { background: var(--tree-green-soft) !important; }
+/* Hide the "file name" row after upload, so the column never grows (the picture is inside the box) */
+.stApp [data-testid="stFileUploaderFile"],
+.stApp [data-testid="stFileUploaderFileList"],
+.stApp [data-testid="stFileUploaderPagination"] { display: none !important; }
+
+/* ---------------------------------------------------------------- "Detect Waste" button (green) */
+.st-key-detect_btn { width: 100%; max-width: var(--box-width); margin: 0 auto; }
+.st-key-detect_btn button {
+  width: 100%; background: var(--tree-green) !important; color: #FFFFFF !important;
+  border: none !important; border-radius: 14px !important; padding: .75rem 1rem !important;
+  box-shadow: 0 4px 14px rgba(122, 138, 58, .35); transition: all .2s ease;
+}
+.st-key-detect_btn button p { color: #FFFFFF !important; font-size: 1.1rem; font-weight: 700; }
+.st-key-detect_btn button:hover { background: var(--tree-green-dark) !important; transform: translateY(-1px); }
+
+/* ---------------------------------------------------------------- Result boxes (same width as the upload box) */
+.result-box, .todo-box {
+  width: 100%; max-width: var(--box-width); margin: 0 auto; box-sizing: border-box;
+  background: var(--tree-green-soft); border: 2px solid var(--tree-green); border-radius: 22px;
+  padding: 1.2rem 1.5rem; box-shadow: 0 6px 24px rgba(122, 138, 58, .18); text-align: left;
+}
+.result-label { color: var(--tree-green-dark); font-size: .85rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
+.result-category { color: var(--tree-green-dark); font-size: 2.2rem; font-weight: 700; line-height: 1.1; margin: .2rem 0 .8rem 0; }
+.confidence-row { display: flex; justify-content: space-between; color: var(--tree-green-dark); font-size: 1rem; font-weight: 700; }
+.confidence-row b { color: var(--tree-green); }
+.confidence-bar { background: rgba(122, 138, 58, .18); border-radius: 999px; height: 10px; margin-top: .4rem; overflow: hidden; }
+.confidence-bar div { background: var(--tree-green); height: 100%; border-radius: 999px; }
+.result-extra { margin-top: .8rem; color: #8A9470; font-size: .95rem; }
+
+.todo-title { color: var(--tree-green-dark); font-size: 1.3rem; font-weight: 700; margin-bottom: .5rem; }
+.todo-category { color: var(--tree-green-dark); font-weight: 700; margin: .7rem 0 .2rem 0; }
+.todo-box ul { margin: 0; padding-left: 1.2rem; color: var(--text); }
+.todo-box li { margin-bottom: .3rem; }
+.todo-box p { margin: 0; color: var(--text); }
+
+/* Streamlit messages (info / warning / error) use the same width */
+.st-key-top [data-testid="stAlert"] { width: 100%; max-width: var(--box-width); margin: 0 auto; }
+
+/* ---------------------------------------------------------------- Small screens (under 900px)
+   One column; the tree picture goes underneath. */
+@media (max-width: 899px) {
+  :root { --page-pad: 1rem; }
+  .st-key-top { min-height: 0; padding-top: 0; }
+  .st-key-top::before { content: none; }
+  .st-key-top::after {
+    content: ""; display: block; order: 99; height: 40vh; margin-top: 1rem;
+    background: var(--hero-url, none) center / contain no-repeat;
+  }
+  .st-key-top [data-testid="stHorizontalBlock"] { flex-direction: column !important; }
+  .st-key-top [data-testid="stColumn"], .st-key-top [data-testid="column"] {
+    width: 100% !important; flex: 1 1 100% !important; min-width: 100% !important;
+  }
+}
