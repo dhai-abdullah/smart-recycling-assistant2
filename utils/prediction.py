@@ -18,7 +18,11 @@ from utils.recycling_guidelines import normalize_label
 
 
 class ModelNotConnectedError(Exception):
-    """Raised when there is no trained model (or the library to run it) yet."""
+    """Raised when the trained model file is missing or empty."""
+
+
+class ModelLoadError(Exception):
+    """Raised when the model file exists but cannot be loaded by Ultralytics."""
 
 
 @dataclass
@@ -42,7 +46,8 @@ class PredictionResult:
 def find_model_file() -> Optional[Path]:
     """Return the path of the model file, or None if it is not there yet."""
     path = config.MODEL_DIR / config.MODEL_FILENAME
-    return path if path.exists() else None
+    # A zero-byte/placeholder file is not a trained model.
+    return path if path.is_file() and path.stat().st_size > 0 else None
 
 
 def model_is_available() -> bool:
@@ -59,7 +64,15 @@ def load_model(model_path: str):
             "The 'ultralytics' library is not installed. "
             "Run: pip install -r requirements.txt"
         ) from error
-    return YOLO(model_path)
+    try:
+        return YOLO(model_path)
+    except Exception as error:
+        raise ModelLoadError(
+            f"Could not load '{Path(model_path).name}'. "
+            "Make sure this is the original trained YOLO .pt weights file "
+            "and that the installed PyTorch/Ultralytics versions support it. "
+            f"Details: {type(error).__name__}: {error}"
+        ) from error
 
 
 # ------------------------------------------------------------------ Image
