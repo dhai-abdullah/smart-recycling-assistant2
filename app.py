@@ -22,7 +22,7 @@ from PIL import Image
 
 import config
 from utils.hero import find_hero_image, hero_data_uri, picture_data_uri
-from utils.prediction import ModelNotConnectedError, load_image, predict
+from utils.prediction import ModelLoadError, ModelNotConnectedError, load_image, predict
 from utils.recycling_guidelines import get_guidelines
 
 st.set_page_config(page_title="Smart Recycling Assistant", page_icon="♻️", layout="wide")
@@ -166,10 +166,16 @@ def run_detection(uploaded) -> None:
             st.session_state["detection"] = {"key": file_key, "result": result}
         except ModelNotConnectedError as error:
             show_picture_in_upload_box(image)
-            st.info(
-                f"🌱 {error}\n\n"
-                "Add the trained model file to the `model/` folder and restart the app. "
-                "See README.md for the exact steps."
+            st.error(
+                f"{error}\n\n"
+                "The expected file is `model/best (3).pt`. "
+                "Upload the original trained weights file, not an empty placeholder."
+            )
+            return
+        except ModelLoadError as error:
+            show_picture_in_upload_box(image)
+            st.error(
+                f"The model file was found but could not be loaded.\n\n{error}"
             )
             return
 
