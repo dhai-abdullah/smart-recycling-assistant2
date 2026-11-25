@@ -8,7 +8,7 @@ BASE_DIR = Path(__file__).parent
 
 # ---------------------------------------------------------------- Model files
 MODEL_DIR = BASE_DIR / "model"
-MODEL_FILENAME = "best.pt"      # put your trained YOLOv8 weights in model/ with this name
+MODEL_FILENAME = "best (3).pt"      # put your trained YOLOv8 weights in model/ with this name
 
 # ---------------------------------------------------------------- Detection
 IMAGE_SIZE = 640                # same size used during training (imgsz=640)
